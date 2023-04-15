@@ -79,9 +79,13 @@ errors as shown by `flycheck-projectile-list-errors' or
   (when-let ((err (tabulated-list-get-id list-pos))
              (buf (flycheck-error-buffer err))
              (pos (flycheck-error-pos err)))
-    (pop-to-buffer buf 'other-window)
-    (goto-char pos)))
-
+    ;;    (pop-to-buffer buf)
+    (switch-to-buffer buf)
+    (goto-char pos)
+    ;; A little hacky - kill the errors buffer
+    (if (get-buffer flycheck-projectile-error-list-buffer)
+	(kill-buffer flycheck-projectile-error-list-buffer))))
+
 (defvar flycheck-projectile--project nil
   "Project whose errors are currently shown.")
 
@@ -242,7 +246,7 @@ called."
   (require 'projectile)
   (declare-function projectile-acquire-root "projectile" (&optional dir))
   (let ((project (projectile-acquire-root dir)))
-    (display-buffer
+    (switch-to-buffer
      (or (and (string= project flycheck-projectile--project)
               ;; The project didn't change *and* we have the old buffer? Reuse
               ;; it.
